@@ -74,12 +74,16 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
           PROJECT_ID: tasktwochaitanya
           REGION: asia-south1
-          SERVICE_NAME: fastapi-service-backend  # <-- put your real Cloud Run service name here
+          SERVICE_NAME: fastapi-service-backend
           IMAGE: y-fastapi-image
           GAR_LOCATION: asia-south1
           REPOSITORY: fastapi-repo
         run: |
-          gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+          # Write secret to a file
+          echo "${GOOGLE_APPLICATION_CREDENTIALS}" > sa-key.json
+      
+          # Authenticate with the service account
+          gcloud auth activate-service-account --key-file=sa-key.json
           gcloud config set project ${PROJECT_ID}
           gcloud config set run/region ${REGION}
       
