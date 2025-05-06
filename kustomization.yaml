@@ -9,3 +9,11 @@ images:
   - name: fastapi-app-gke
     newName: asia-south1-docker.pkg.dev/tasktwochaitanya/fastapi-repo/y-fastapi-image
     newTag: latest
+patches:
+  - target:
+      kind: Deployment
+      name: fastapi-app-gke # Make sure this is correct
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: asia-south1-docker.pkg.dev/your-project/your-repo/your-image:${{ IMAGE_TAG }} # Use env variable
