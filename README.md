@@ -57,7 +57,8 @@
     '''bash
         docker run -d -p host_port:container_port --name your_container_name your_app_name:latest
     '''
-    -You can also define the env variables (--env-file .env)
+    -You can also define the env variables (--env-file .env).
+    
 -**Step 6 : Testing locally in `Postman`**
     -From the local url i.e http://localhost:8000/.. we can test our application and check if it is working properly
     -The routes must match the exact paths for testing locally as mentioned below:
