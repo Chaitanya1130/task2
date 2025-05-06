@@ -63,6 +63,15 @@ async def convertanythingtohello(text:TextInput):
     storedtext=text.text
     result=await text_collection.insert_one({"reviewedtext":reviewedtext,"storedtext":storedtext})
     return TextOutput(id=str(result.inserted_id), reviewedtext=reviewedtext, storedtext=storedtext)
+@router.post("/convertanythingtohi", response_model=TextOutput)
+async def convertanythingtohi(text:TextInput):
+    logger.info(f"Received text for conversion to 'Hi': {text.text}")
+    text_collection=await get_text_collection()
+    reviewedtext="Hi"
+    logger.info(f"Converted text: {reviewedtext}")
+    storedtext=text.text
+    result=await text_collection.insert_one({"reviewedtext":reviewedtext,"storedtext":storedtext})
+    return TextOutput(id=str(result.inserted_id), reviewedtext=reviewedtext, storedtext=storedtext)
 # @router.get("/getText/{item_id}", response_model=TextOutput)
 # async def get_text(item_id: str, text_collection=Depends(get_text_collection)):
 #     try:
