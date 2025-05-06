@@ -54,6 +54,18 @@ async def countWordsandCharacters(text:TextInput):
     result=await text_collection.insert_one({"reviewedtext":reviewedtext,"storedtext":storedtext})
     return TextOutput(id=str(result.inserted_id), reviewedtext=reviewedtext, storedtext=storedtext)
 
+
+@router.post("/converttoAscii",response_model=TextOutput)
+async def converttoAscii(text:TextInput):
+    logger.info(f"Received text for ASCII conversion: {text.text}")
+    text_collection=await get_text_collection()
+    ascii_values=[ord(char) for char in text.text]
+    reviewedtext=" ".join(str(value) for value in ascii_values)
+    logger.info(f"Converted to ASCII: {reviewedtext}")
+    storedtext=text.text
+    result=await text_collection.insert_one({"reviewedtext":reviewedtext,"storedtext":storedtext})
+    return TextOutput(id=str(result.inserted_id), reviewedtext=reviewedtext, storedtext=storedtext)
+
 # @router.get("/getText/{item_id}", response_model=TextOutput)
 # async def get_text(item_id: str, text_collection=Depends(get_text_collection)):
 #     try:
