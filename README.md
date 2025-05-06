@@ -195,7 +195,7 @@ jobs:
         --platform managed \
         --allow-unauthenticated
 ```
-
+- With GitHub Actions, every time we push changes to the code, it automatically kicks off a pipeline that takes care of building the image, pushing it to the container, and deploying it. This lets us put automation to levrage and saves us from having to do all these steps manually each time.
 ---
 
 ## Step 10: YAML Files for Kubernetes
