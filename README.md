@@ -126,3 +126,6 @@
 - Select the service.
 - Open the "Logs" tab.
 - View the logs.
+
+## Step 9: Automating build,push and deployment
+
