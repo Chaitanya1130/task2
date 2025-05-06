@@ -48,20 +48,20 @@
     ```
 
 - **Step 4 : Build the Docker Image**
-    -Build it with the command:
+    - Build it with the command:
     ```bash
-        docker build -t your_app_name:latest .
+        docker build -t your_app_name:latest 
     ```
 - **Step 5: Run the Docker Container**
-    -Run it with the command:
+    - Run it with the command:
     '''bash
         docker run -d -p host_port:container_port --name your_container_name your_app_name:latest
     '''
-    -You can also define the env variables (--env-file .env).
+    - You can also define the env variables (--env-file .env).
 
 - **Step 6 : Testing locally in `Postman`**
-    -From the local url i.e http://localhost:8000/.. we can test our application and check if it is working properly
-    -The routes must match the exact paths for testing locally as mentioned below:
+    - From the local url i.e http://localhost:8000/.. we can test our application and check if it is working properly
+    - The routes must match the exact paths for testing locally as mentioned below:
         -http://localhost:8000/text/changetoUpperCase
         -http://localhost:8000/text/changetoLowerCase
         -http://localhost:8000/text/reverseText
@@ -73,20 +73,20 @@
     '''bash
         docker build -t image-name .
     '''
-    -The next step is to tag the image which can be done with the follwing command 
+    - The next step is to tag the image which can be done with the follwing command 
     '''bash
         docker tag image-name:latest asia-south1-docker.pkg.dev/id/repo-name/image-name:latest
     '''
-    -Finally to push the above tag/artifact we have to follow the command
+    - Finally to push the above tag/artifact we have to follow the command
     '''bash
         docker push asia-south1-docker.pkg.dev/id/repo-name/image-name
     '''
-    -Now the artifact has been successfully pushed to the container, we have to deploy the container to cloud run using the follwing command 
+    - Now the artifact has been successfully pushed to the container, we have to deploy the container to cloud run using the follwing command 
     '''bash
         gcloud run deploy service-name     --image asia-south1-docker.pkg.dev/id/repo-name/image-name:latest     --region asia-south1     --platform managed     --allow-unauthenticated
     '''
-    -The id and repository name can be obtained at the time of creating the new project. 
-    -After successful execution we will receive a public url, this public url can be used for testing like this:
+    - The id and repository name can be obtained at the time of creating the new project. 
+    - After successful execution we will receive a public url, this public url can be used for testing like this:
         -https://fastapi-service-backend-181462483271.asia-south1.run.app
         -To test this we have to follow the same exact routes:
             -url/text/changetoUpperCase
@@ -94,12 +94,12 @@
             -url/text/reverseText
             -url/text/countWordsandCharacters
 - **Step 8 : Adding Cloud logs and Viewing them**:
-    -Adding 
-        -import logging module
-        -create a logger instance using the command logging.getLogger(__name__)
-        -methods of logging are logger.info(),logger.warning(),logger.error(),logger.debug()
-    -Viewing
-        -go to cloud run 
-        -select service
-        -open logs tab
-        -view logs
+    - Adding 
+        - import logging module
+        - create a logger instance using the command logging.getLogger(__name__)
+        - methods of logging are logger.info(),logger.warning(),logger.error(),logger.debug()
+    - Viewing
+        - go to cloud run 
+        - select service
+        - open logs tab
+        - view logs
