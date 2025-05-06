@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-app-gke
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fastapi-app-gke
+  template:
+    metadata:
+      labels:
+        app: fastapi-app-gke
+    spec:
+      containers:
+        - name: fastapi-app-gke
+          image: asia-south1-docker.pkg.dev/tasktwochaitanya/fastapi-repo/y-fastapi-image:latest
+          ports:
+            - containerPort: 80
