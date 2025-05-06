@@ -52,14 +52,14 @@
     ```bash
         docker build -t your_app_name:latest .
     ```
--**Step 5: Run the Docker Container**
+- **Step 5: Run the Docker Container**
     -Run it with the command:
     '''bash
         docker run -d -p host_port:container_port --name your_container_name your_app_name:latest
     '''
     -You can also define the env variables (--env-file .env).
-    
--**Step 6 : Testing locally in `Postman`**
+
+- **Step 6 : Testing locally in `Postman`**
     -From the local url i.e http://localhost:8000/.. we can test our application and check if it is working properly
     -The routes must match the exact paths for testing locally as mentioned below:
         -http://localhost:8000/text/changetoUpperCase
@@ -68,7 +68,7 @@
         -http://localhost:8000/text/countWordsandCharacters
         
         
--**Step 7 : Deploying the container to `Google cloud Run`**
+- **Step 7 : Deploying the container to `Google cloud Run`**
     - After the image has been successfully built with the command 
     '''bash
         docker build -t image-name .
@@ -93,7 +93,7 @@
             -url/text/changetoLowerCase
             -url/text/reverseText
             -url/text/countWordsandCharacters
--**Step 8 : Adding Cloud logs and Viewing them**:
+- **Step 8 : Adding Cloud logs and Viewing them**:
     -Adding 
         -import logging module
         -create a logger instance using the command logging.getLogger(__name__)
