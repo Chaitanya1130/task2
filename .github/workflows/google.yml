@@ -34,8 +34,9 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+          service_account: 'github-actions-deployer-task@tasktwochaitanya.iam.gserviceaccount.com'  # Add this line
           project_id: '${{ env.PROJECT_ID }}'
-          token_format: 'access_token'  # Add this line to explicitly request an access token
+          token_format: 'access_token'
 
       - name: 'Docker Auth'
         uses: 'docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567'
