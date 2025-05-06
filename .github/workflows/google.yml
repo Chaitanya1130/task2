@@ -71,11 +71,22 @@ jobs:
 
       - name: 'Deploy to GKE'
         run: |-
-          # REMOVE cd k8s unless you have a 'k8s' folder; adjust path if needed
+          # Change to the directory containing your kustomization.yaml, if necessary.
           if [ -f k8s/kustomization.yaml ]; then
             cd k8s
+          elif [ -f kustomization.yaml ]; then
+            cd .
+          else
+            echo "Error: kustomization.yaml not found"
+            exit 1
           fi
-
+      
+          # Update the image tag in the Kustomize configuration using the correct variable.
           kustomize edit set image ${DEPLOYMENT_NAME}=${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:${GITHUB_SHA}
+      
+          # Apply the Kustomize configuration to your GKE cluster.
           kustomize build . | kubectl apply -f -
+      
+          # Check the rollout status of the deployment.
           kubectl rollout status deployment/${DEPLOYMENT_NAME}
+
