@@ -128,4 +128,9 @@
 - View the logs.
 
 ## Step 9: Automating build,push and deployment
-###hellotherewee
+1. First step is to go to your Github repository and select the actions tab.
+2. Based on the project select the necessary configuration, in this case GKE(Google Kubernetes Engine).
+3. Next an automated workflow file will be generated, we will have to modeify the file based upon the projects requirements.
+4. Go on to Google Cloud Run and update a few details such as workload Identity Federation etc.
+5. create a deployment.yaml,service.yaml,kustomization.yaml file 
+6. Once we start commiting the changes, github actions will automatically integrate and deploy.
