@@ -1,157 +1,81 @@
 name: 'Build and Deploy to GKE'
- 
 
- 
 on:
- 
   push:
- 
     branches:
- 
       - 'main'
- 
 
- 
 env:
- 
   PROJECT_ID: 'tasktwochaitanya'
- 
   GAR_LOCATION: 'asia-south1'
- 
   GKE_CLUSTER: 'task-gke'
- 
   GKE_ZONE: 'asia-south1-a'
- 
   DEPLOYMENT_NAME: 'fastapi-app-gke'
- 
   REPOSITORY: 'fastapi-repo'
- 
   IMAGE: 'y-fastapi-image'
- 
   WORKLOAD_IDENTITY_PROVIDER: 'projects/181462483271/locations/global/workloadIdentityPools/github-actions-pool/providers/github-oidc-provider-chaitanya'
- 
 
- 
 jobs:
- 
   setup-build-publish-deploy:
- 
     name: 'Setup, Build, Publish, and Deploy'
- 
     runs-on: 'ubuntu-latest'
- 
     environment: 'production'
- 
 
- 
     permissions:
- 
       contents: 'read'
- 
       id-token: 'write'
- 
 
- 
     steps:
- 
       - name: 'Checkout'
- 
         uses: actions/checkout@v4
- 
 
- 
       - id: 'auth'
- 
         name: 'Authenticate to Google Cloud'
- 
         uses: google-github-actions/auth@v2
- 
         with:
- 
           workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
- 
           service_account: 'github-actions-deployer-task@tasktwochaitanya.iam.gserviceaccount.com'
- 
           project_id: '${{ env.PROJECT_ID }}'
- 
           token_format: 'access_token'
- 
 
- 
       - name: 'Docker Auth'
- 
         uses: docker/login-action@v3
- 
         with:
- 
           username: 'oauth2accesstoken'
- 
           password: '${{ steps.auth.outputs.access_token }}'
- 
           registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
- 
 
- 
       - name: 'Set up GKE credentials'
- 
         uses: google-github-actions/get-gke-credentials@v2
- 
         with:
- 
           cluster_name: '${{ env.GKE_CLUSTER }}'
- 
           location: '${{ env.GKE_ZONE }}'
- 
           project_id: '${{ env.PROJECT_ID }}'
- 
 
- 
       - name: 'Build and push Docker container'
- 
         run: |-
- 
           DOCKER_TAG="${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:${GITHUB_SHA}"
- 
           docker build \
- 
             --tag "${DOCKER_TAG}" \
- 
             --build-arg GITHUB_SHA="${GITHUB_SHA}" \
- 
             --build-arg GITHUB_REF="${GITHUB_REF}" \
- 
             .
- 
           docker push "${DOCKER_TAG}"
- 
 
- 
       - name: 'Set up Kustomize'
- 
         run: |-
- 
           curl -sfLo kustomize_v5.4.3_linux_amd64.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.4.3/kustomize_v5.4.3_linux_amd64.tar.gz
- 
           tar -xzf kustomize_v5.4.3_linux_amd64.tar.gz
- 
           sudo mv kustomize /usr/local/bin
- 
           chmod +x /usr/local/bin/kustomize
- 
 
- 
       - name: 'Deploy to GKE'
- 
         run: |-
- 
+          # REMOVE cd k8s unless you have a 'k8s' folder; adjust path if needed
+          if [ -f k8s/kustomization.yaml ]; then
+            cd k8s
+          fi
 
-          cd k8s  # adjust this if your kustomization.yaml is in another directory (or remove if it's in root)
- 
-
-          # cd k8s  # adjust this if your kustomization.yaml is in another directory (or remove if it's in root)
- 
-          kustomize edit set image fastapi-app-gke=${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${GITHUB_SHA}
- 
+          kustomize edit set image ${DEPLOYMENT_NAME}=${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${IMAGE}:${GITHUB_SHA}
           kustomize build . | kubectl apply -f -
- 
-          kubectl rollout status deployment/${{ env.DEPLOYMENT_NAME }}
+          kubectl rollout status deployment/${DEPLOYMENT_NAME}
