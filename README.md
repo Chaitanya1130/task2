@@ -23,16 +23,16 @@
   # Copy the requirements file into the container 
   COPY requirements.txt .
 
-  # Installs the application dependencies listed in requirements.txt
+  # Install the application dependencies listed in requirements.txt
   RUN pip install --upgrade pip && pip install -r requirements.txt
 
   # Copy the application code into the container
   COPY . .
 
   # Expose the port that your FastAPI application runs on (usually 8000)
-  EXPOSE portNumber
+  EXPOSE 8000
 
-  # Defines the command to start your FastAPI application. It uses Uvicorn, an ASGI server, and specifies the host, port, and the location of your FastAPI app (main:app).
+  # Define the command to start your FastAPI application
   CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
   ```
 
@@ -65,7 +65,7 @@
 ## Step 5: Run the Docker Container
 - Run the Docker container with the following command:
   ```bash
-  docker run -d -p host_port:container_port --name your_container_name your_app_name:latest
+  docker run -d -p 8000:8000 --name your_container_name your_app_name:latest
   ```
 - You can also define environment variables using the `--env-file .env` option.
 
@@ -84,16 +84,16 @@
 ## Step 7: Deploying the Container to `Google Cloud Run`
 1. After the image has been successfully built, tag the image with the following command:
    ```bash
-   docker tag image-name:latest asia-south1-docker.pkg.dev/id/repo-name/image-name:latest
+   docker tag your_app_name:latest asia-south1-docker.pkg.dev/id/repo-name/your_app_name:latest
    ```
 2. Push the tagged image to the container registry:
    ```bash
-   docker push asia-south1-docker.pkg.dev/id/repo-name/image-name
+   docker push asia-south1-docker.pkg.dev/id/repo-name/your_app_name
    ```
 3. Deploy the container to Cloud Run using the following command:
    ```bash
    gcloud run deploy service-name \
-       --image asia-south1-docker.pkg.dev/id/repo-name/image-name:latest \
+       --image asia-south1-docker.pkg.dev/id/repo-name/your_app_name:latest \
        --region asia-south1 \
        --platform managed \
        --allow-unauthenticated
@@ -126,3 +126,83 @@
 - Select the service.
 - Open the "Logs" tab.
 - View the logs.
+
+---
+
+## Step 9: Automating Build, Push, and Deployment
+### Necessary Pre-Steps
+1. A Google Cloud Project (e.g., `tasktwochaitanya`).
+2. GKE cluster created.
+3. Cloud Run service ready.
+4. A GitHub repository (e.g., `Chaitanya1130/task2`) with the FastAPI code.
+5. A Service Account with permissions for GKE, Cloud Run, and Artifact Registry.
+
+### Steps
+1. Build and push the Docker image:
+   ```bash
+   docker build -t asia-south1-docker.pkg.dev/tasktwochaitanya/fastapi-repo/y-fastapi-image:latest .
+   docker push asia-south1-docker.pkg.dev/tasktwochaitanya/fastapi-repo/y-fastapi-image:latest
+   ```
+2. Configure for GKE using `kustomization.yaml`:
+   ```yaml
+   apiVersion: kustomize.config.k8s.io/v1beta1
+   kind: Kustomization
+
+   resources:
+     - deployment.yaml
+     - service.yaml
+
+   images:
+     - name: fastapi-app-gke
+       newName: asia-south1-docker.pkg.dev/tasktwochaitanya/fastapi-repo/y-fastapi-image
+       newTag: latest
+
+   patches:
+     - target:
+         kind: Deployment
+         name: fastapi-app-gke
+       patch: |-
+         - op: replace
+           path: /spec/template/spec/containers/0/image
+           value: asia-south1-docker.pkg.dev/tasktwochaitanya/fastapi-repo/y-fastapi-image:${{ IMAGE_TAG }}
+   ```
+3. Set up GitHub Actions Workflow:
+   ```yaml
+   on:
+     push:
+       branches:
+         - main
+
+   jobs:
+     deploy:
+       runs-on: ubuntu-latest
+       env:
+         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+         PROJECT_ID: tasktwochaitanya
+         REGION: asia-south1
+         SERVICE_NAME: fastapi-service-backend
+         IMAGE: y-fastapi-image
+         GAR_LOCATION: asia-south1
+         REPOSITORY: fastapi-repo
+   ```
+
+---
+
+## Step 10: YAML Files
+- Configured Kubernetes using `deployment.yaml` and `service.yaml` to define the app setup and service exposure. A `kustomization.yaml` was used to patch the container image dynamically during the CI/CD pipeline. This setup allows the GitHub Actions workflow to update only the image tag and apply the new configuration without rewriting the manifests.
+
+### Key Files:
+1. **`deployment.yaml`**:
+   - Defines:
+     - Container image
+     - Exposed port
+     - Environment variables
+     - Kubernetes Deployment for `fastapi-app-gke`
+
+2. **`service.yaml`**:
+   - Connects to pods with the label `app: fastapi-app-gke`.
+
+3. **`kustomization.yaml`**:
+   - Specifies:
+     - Resources to apply (`deployment.yaml`, `service.yaml`).
+     - Dynamic patching of the container image.
