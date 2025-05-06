@@ -16,4 +16,4 @@ patches:
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: asia-south1-docker.pkg.dev/your-project/your-repo/your-image:${{ IMAGE_TAG }} # Use env variable
+        value: asia-south1-docker.pkg.dev/your-project/fastapi-repo/y-fastapi-image:${{ IMAGE_TAG }} # Use env variable

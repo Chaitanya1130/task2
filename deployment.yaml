@@ -14,11 +14,12 @@ spec:
     spec:
       containers:
         - name: fastapi-app-gke
-          image: asia-south1-docker.pkg.dev/tasktwochaitanya/fastapi-repo/y-fastapi-image:latest
+          image: asia-south1-docker.pkg.dev/tasktwochaitanya/fastapi-repo/y-fastapi-image:latest  # Update image reference if needed
           ports:
             - containerPort: 80
           env:
             - name: db_name
-              value: task_database  # <-- Replace with your MongoDB database name
+              value: task_database  # Replace with your MongoDB database name
             - name: mongo_uri
-              value: mongodb+srv://thinkingcap1130:Chaitanya1130@cluster0.2ogyjhu.mongodb.net/task_database # <-- Add your MongoDB URI
+              value: mongodb+srv://thinkingcap1130:Chaitanya1130@cluster0.2ogyjhu.mongodb.net/task_database  # Replace with your MongoDB URI
+
