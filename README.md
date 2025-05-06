@@ -128,4 +128,4 @@
 - View the logs.
 
 ## Step 9: Automating build,push and deployment
-###hellotherewe
+###hellotherewee
